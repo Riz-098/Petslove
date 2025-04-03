@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetLove - Наши питомцы</title>
+    <style>
+        :root {
+            --primary-color: #6a4c93;
+            --secondary-color: #8a5a44;
+            --accent-color: #f8c537;
+            --light-color: #f9f7f3;
+            --dark-color: #333333;
+            --success-color: #4caf50;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+        body.modal-open {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+}
+.modal {
+    overflow-y: auto;
+}
+
+.modal-content {
+    max-height: 80vh;
+    overflow-y: auto;
+}
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo span {
+            color: var(--accent-color);
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+        
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        nav ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .nav-button {
+            background-color: var(--accent-color);
+            color: var(--dark-color);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-button:hover {
+            background-color: #e0b42e;
+            transform: translateY(-2px);
+        }
+        
+        .page-header {
+            background: linear-gradient(rgba(106, 76, 147, 0.8), rgba(106, 76, 147, 0.6)), url('https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center/cover;
+            height: 40vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 0 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .page-header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .pets-section {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .pets-filter {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-button {
+            background-color: white;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 0.5rem 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .filter-button:hover, .filter-button.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .pets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        
+        .pet-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .pet-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .pet-image {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+        }
+        
+        .pet-info {
+            padding: 1.5rem;
+        }
+        
+        .pet-info h3 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .pet-info p {
+            margin-bottom: 0.8rem;
+            color: var(--dark-color);
+        }
+        
+        .pet-info .age {
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
+        
+        .pet-details {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+        
+        .pet-details h4 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .pet-details ul {
+            list-style-type: none;
+            font-size: 0.9rem;
+        }
+        
+        .pet-details li {
+            margin-bottom: 0.3rem;
+        }
+        
+        .details-button {
+            background-color: var(--accent-color);
+            color: var(--dark-color);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 1rem;
+        }
+        
+        .details-button:hover {
+            background-color: #e0b42e;
+        }
+        
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+      
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        .close-btn {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--dark-color);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .add-pet-btn {
+            background-color: var(--accent-color);
+            color: var(--dark-color);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 2rem auto;
+            font-size: 1rem;
+        }
+
+        .add-pet-btn:hover {
+            background-color: #e0b42e;
+            transform: translateY(-2px);
+        }
+
+        .submit-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .submit-btn:hover {
+            background-color: #5a3f7a;
+        }
+        
+        @media (max-width: 768px) {
+            nav ul {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                background-color: var(--primary-color);
+                padding: 1rem;
+                z-index: 100;
+            }
+            
+            nav ul.show {
+                display: flex;
+            }
+            
+            nav ul li {
+                margin: 0.5rem 0;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .page-header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .pets-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                margin: 10% auto;
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">Pet<span>Love</span></div>
+        <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+        <nav>
+            <ul id="navMenu">
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="shop.html">Магазин</a></li>
+                <li><a href="reviews.html">Отзывы</a></li>
+                <li><a href="messenger.html">Месенджер</a></li>
+                <li><a href="support.html">Тех. поддержка</a></li>
+                <li><a href="profile.html">Профиль</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <section class="page-header">
+        <h1>Наши питомцы</h1>
+        <p>Найдите своего идеального компаньона среди наших любимцев</p>
+    </section>
+    
+    <section class="pets-section">
+        <div class="pets-filter">
+            <button class="filter-button active" data-filter="all">Все</button>
+            <button class="filter-button" data-filter="cat">Кошки</button>
+            <button class="filter-button" data-filter="dog">Собаки</button>
+            <button class="filter-button" data-filter="other">Другие</button>
+        </div>
+        
+        <button class="add-pet-btn" id="addPetBtn">+ Добавить питомца</button>
+        
+        <div class="pets-grid" id="petsGrid">
+
+            <div class="pet-card" data-category="cat">
+                <img src="https://sun9-23.userapi.com/pzeejbA34tlfnKHL0xyvflHcoS4yE5nEGeF-xA/vdgSAxHEhbg.jpg" alt="Британский кот" class="pet-image">
+                <div class="pet-info">
+                    <h3>Британский кот</h3>
+                    <p class="age">Возраст: 1 год</p>
+                    <p>Спокойный и ласковый, идеальный компаньон для дома.</p>
+                    
+                    <div class="pet-details">
+                        <h4>Приюты:</h4>
+                        <ul>
+                            <li>«Ласковый кот», Москва</li>
+                            <li>«Дом для кошек», Санкт-Петербург</li>
+                        </ul>
+                        
+                        <h4>Рекомендуемые корма:</h4>
+                        <ul>
+                            <li>Royal Canin British Shorthair</li>
+                            <li>Purina Pro Plan Delicate</li>
+                        </ul>
+                        <h4>Номер телефона приютов:</h4>
+                        <ul>
+                            <li>+7(495)774-78-74</li>
+                            <li>+7(911)299-66-33</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pet-card" data-category="cat">
+                <img src="https://avatars.mds.yandex.net/i?id=6dec662d95c31788b54fec0b51eae5b6_l-8185142-images-thumbs&n=13" alt="Сфинкс" class="pet-image">
+                <div class="pet-info">
+                    <h3>Сфинкс</h3>
+                    <p class="age">Возраст: 10 месяцев</p>
+                    <p>Энергичный и общительный, любит внимание и тепло.</p>
+                    
+                    <div class="pet-details">
+                        <h4>Приюты:</h4>
+                        <ul>
+                            <li>«Кошкин дом», Москва</li>
+                            <li>«Без шерсти», Санкт-Петербург</li>
+                        </ul>
+                        
+                        <h4>Рекомендуемые корма:</h4>
+                        <ul>
+                            <li>Hills Science Plan для бесшерстных</li>
+                            <li>Acana Regionals</li>
+                        </ul>
+                        <h4>Номер телефона приютов:</h4>
+                        <ul>
+                            <li>+7(495)925-75-03</li>
+                            <li>+7(911)607-28-50</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pet-card" data-category="cat">
+                <img src="https://avatars.mds.yandex.net/i?id=3eaed803f1a5f94a9f0d878f63fe0124_l-5232350-images-thumbs&n=13" alt="Шотландская вислоухая" class="pet-image">
+                <div class="pet-info">
+                    <h3>Шотландская вислоухая</h3>
+                    <p class="age">Возраст: 8 месяцев</p>
+                    <p>Дружелюбная и игривая, с характерными загнутыми ушками.</p>
+                    
+                    <div class="pet-details">
+                        <h4>Приюты:</h4>
+                        <ul>
+                            <li>«Ушки на макушке», Москва</li>
+                            <li>«Скоттиш клуб», Санкт-Петербург</li>
+                        </ul>
+                        
+                        <h4>Рекомендуемые корма:</h4>
+                        <ul>
+                            <li>Royal Canin Scottish Fold</li>
+                            <li>Farmina N&D</li>
+                        </ul>
+                        <h4>Номер телефона приютов:</h4>
+                        <ul>
+                            <li>+7(495)956-47-57</li>
+                            <li>+7(911)711-48-22</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pet-card" data-category="cat">
+                <img src="https://avatars.dzeninfra.ru/get-zen_doc/271828/pub_668714589c5cce6e0f463b1d_668719f562d21a0b5b99e72d/scale_1200" alt="Мейн-кун" class="pet-image">
+                <div class="pet-info">
+                    <h3>Мейн-кун</h3>
+                    <p class="age">Возраст: 1.5 года</p>
+                    <p>Крупный и добродушный гигант с роскошной шерстью.</p>
+                    
+                    <div class="pet-details">
+                        <h4>Приюты:</h4>
+                        <ul>
+                            <li>«Большие кошки», Москва</li>
+                            <li>«Мейн кун дом», Санкт-Петербург</li>
+                        </ul>
+                        
+                        <h4>Рекомендуемые корма:</h4>
+                        <ul>
+                            <li>Royal Canin Maine Coon</li>
+                            <li>Orijen Cat & Kitten</li>
+                        </ul>
+                        <h4>Номер телефона приютов:</h4>
+                        <ul>
+                            <li>+7(495)669-35-78</li>
+                            <li>+7(911)313-05-46</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pet-card" data-category="dog">
+                <img src="https://sun9-36.userapi.com/impf/c630927/v630927457/231e5/Kkga5lhSRVU.jpg?size=807x605&quality=96&sign=7c88a6c67d6c305a56db380cdd7f0e94&c_uniq_tag=pnakQJtX1c_RI2TfnkNk3OE2B-DKuN8tWiGydW9VLoU&type=album" alt="Лабрадор" class="pet-image">
+                <div class="pet-info">
+                    <h3>Лабрадор</h3>
+                    <p class="age">Возраст: 2 года</p>
+                    <p>Дружелюбный и активный, отличный компаньон для семьи.</p>
+                    
+                    <div class="pet-details">
+                        <h4>Приюты:</h4>
+                        <ul>
+                            <li>«Лабрадор хаус», Москва</li>
+                            <li>«Собачье сердце», Санкт-Петербург</li>
+                        </ul>
+                        
+                        <h4>Рекомендуемые корма:</h4>
+                        <ul>
+                            <li>Royal Canin Labrador Retriever</li>
+                            <li>Purina Pro Plan Large Breed</li>
+                        </ul>
+                        <h4>Номер телефона приютов:</h4>
+                        <ul>
+                            <li>+7(495)674-30-02</li>
+                            <li>+7(911)464-09-84</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pet-card" data-category="dog">
+                <img src="https://avatars.mds.yandex.net/i?id=58797585d4d92a92efedf5548e8cb19d_l-5232865-images-thumbs&n=13" alt="Бигль" class="pet-image">
+                <div class="pet-info">
+                    <h3>Бигль</h3>
+                    <p class="age">Возраст: 1 год</p>
+                    <p>Энергичный и любознательный, с отличным нюхом.</p>
+                    
+                    <div class="pet-details">
+                        <h4>Приюты:</h4>
+                        <ul>
+                            <li>«Гав и мяу», Москва</li>
+                            <li>«Друг человека», Санкт-Петербург</li>
+                        </ul>
+                        
+                        <h4>Рекомендуемые корма:</h4>
+                        <ul>
+                            <li>Hills Science Plan для средних пород</li>
+                            <li>Acana Heritage</li>
+                        </ul>
+                        <h4>Номер телефона приютов:</h4>
+                        <ul>
+                            <li>+7(495)944-87-24</li>
+                            <li>+7(911)928-78-97</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pet-card" data-category="other">
+                <img src="https://avatars.mds.yandex.net/i?id=cf5cb4932c2de6706a133a920c2aade0_l-4575735-images-thumbs&n=13" alt="Кролик" class="pet-image">
+                <div class="pet-info">
+                    <h3>Кролик</h3>
+                    <p class="age">Возраст: 2 месяцев</p>
+                    <p>Пушистый и милый, идеальный питомец для квартиры.</p>
+                    
+                    <div class="pet-details">
+                        <h4>Приюты:</h4>
+                        <ul>
+                            <li>«Ушастик», Москва</li>
+                            <li>«Дом для грызунов», Санкт-Петербург</li>
+                        </ul>
+                        
+                        <h4>Рекомендуемые корма:</h4>
+                        <ul>
+                            <li>Versele-Laga Complete Rabbit</li>
+                            <li>Little One Rabbit</li>
+                        </ul>
+                        <h4>Номер телефона приютов:</h4>
+                        <ul>
+                            <li>+7(495)817-14-28</li>
+                            <li>+7(911)090-91-37</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+   
+    <div class="modal" id="addPetModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Добавить нового питомца</h2>
+                <span class="close-btn" id="closeModal">&times;</span>
+            </div>
+            <form id="petForm">
+                <div class="form-group">
+                    <label for="petType">Тип животного:</label>
+                    <select id="petType" required>
+                        <option value="">Выберите тип</option>
+                        <option value="cat">Кошка</option>
+                        <option value="dog">Собака</option>
+                        <option value="other">Другое</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="petBreed">Порода:</label>
+                    <input type="text" id="petBreed" required placeholder="Например: Британский кот">
+                </div>
+                
+                <div class="form-group">
+                    <label for="petAge">Возраст:</label>
+                    <input type="text" id="petAge" required placeholder="Например: 1 год">
+                </div>
+                
+                <div class="form-group">
+                    <label for="petDescription">Описание:</label>
+                    <textarea id="petDescription" required placeholder="Опишите характер и особенности питомца"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="petShelters">Приюты (через запятую):</label>
+                    <textarea id="petShelters" required placeholder="Например: Ласковый кот, Москва; Дом для кошек, Санкт-Петербург"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="petFood">Рекомендуемые корма (через запятую):</label>
+                    <textarea id="petFood" required placeholder="Например: Royal Canin British Shorthair, Purina Pro Plan Delicate"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="petPhones">Номера телефонов приютов (через запятую):</label>
+                    <textarea id="petPhones" required placeholder="Например: +7(495)774-78-74, +7(911)299-66-33"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="petImage">Ссылка на изображение:</label>
+                    <input type="text" id="petImage" placeholder="Вставьте URL изображения">
+                </div>
+                
+                <button type="submit" class="submit-btn">Добавить питомца</button>
+            </form>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="footer-links">
+            <a href="index.html">Главная</a>
+            <a href="#">О нас</a>
+            <a href="#">Контакты</a>
+            <a href="#">Политика конфиденциальности</a>
+        </div>
+        <p>© 2023 PetLove. Все права защищены.</p>
+    </footer>
+    
+    <script>
+        
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const navMenu = document.getElementById('navMenu');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            navMenu.classList.toggle('show');
+        });
+        
+       
+        const filterButtons = document.querySelectorAll('.filter-button');
+        const petCards = document.querySelectorAll('.pet-card');
+        
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+               
+                button.classList.add('active');
+                
+                const filter = button.dataset.filter;
+                
+                petCards.forEach(card => {
+                    if (filter === 'all' || card.dataset.category === filter) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+        
+       
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const petCards = document.querySelectorAll('.pet-card');
+            
+            petCards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
+        });
+
+        
+        const addPetBtn = document.getElementById('addPetBtn');
+        const addPetModal = document.getElementById('addPetModal');
+        const closeModal = document.getElementById('closeModal');
+        const petForm = document.getElementById('petForm');
+        const petsGrid = document.getElementById('petsGrid');
+
+       
+        addPetBtn.addEventListener('click', () => {
+            addPetModal.style.display = 'block';
+        });
+
+addPetBtn.addEventListener('click', () => {
+    addPetModal.style.display = 'block';
+    document.body.classList.add('modal-open');
+});
+
+
+closeModal.addEventListener('click', () => {
+    addPetModal.style.display = 'none';
+    document.body.classList.remove('modal-open');
+});
+
+window.addEventListener('click', (e) => {
+    if (e.target === addPetModal) {
+        addPetModal.style.display = 'none';
+        document.body.classList.remove('modal-open');
+    }
+});
+        
+        closeModal.addEventListener('click', () => {
+            addPetModal.style.display = 'none';
+        });
+
+        
+        window.addEventListener('click', (e) => {
+            if (e.target === addPetModal) {
+                addPetModal.style.display = 'none';
+            }
+        });
+
+       
+        petForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+           
+            const petType = document.getElementById('petType').value;
+            const petBreed = document.getElementById('petBreed').value;
+            const petAge = document.getElementById('petAge').value;
+            const petDescription = document.getElementById('petDescription').value;
+            const petShelters = document.getElementById('petShelters').value.split(',').map(item => item.trim());
+            const petFood = document.getElementById('petFood').value.split(',').map(item => item.trim());
+            const petPhones = document.getElementById('petPhones').value.split(',').map(item => item.trim());
+            const petImage = document.getElementById('petImage').value || 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80';
+            
+            
+            const newPetCard = document.createElement('div');
+            newPetCard.className = 'pet-card';
+            newPetCard.dataset.category = petType;
+            newPetCard.style.opacity = '0';
+            newPetCard.style.transform = 'translateY(20px)';
+            newPetCard.style.transition = 'all 0.3s ease';
+            
+          
+            newPetCard.innerHTML = `
+                <img src="${petImage}" alt="${petBreed}" class="pet-image">
+                <div class="pet-info">
+                    <h3>${petBreed}</h3>
+                    <p class="age">Возраст: ${petAge}</p>
+                    <p>${petDescription}</p>
+                    
+                    <div class="pet-details">
+                        <h4>Приюты:</h4>
+                        <ul>
+                            ${petShelters.map(shelter => `<li>${shelter}</li>`).join('')}
+                        </ul>
+                        
+                        <h4>Рекомендуемые корма:</h4>
+                        <ul>
+                            ${petFood.map(food => `<li>${food}</li>`).join('')}
+                        </ul>
+                        <h4>Номер телефона приютов:</h4>
+                        <ul>
+                            ${petPhones.map(phone => `<li>${phone}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+            
+           
+            petsGrid.appendChild(newPetCard);
+            
+           
+            setTimeout(() => {
+                newPetCard.style.opacity = '1';
+                newPetCard.style.transform = 'translateY(0)';
+            }, 100);
+            
+           
+            addPetModal.style.display = 'none';
+            petForm.reset();
+            
+           
+            const activeFilter = document.querySelector('.filter-button.active').dataset.filter;
+            if (activeFilter !== 'all' && activeFilter !== petType) {
+                newPetCard.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
